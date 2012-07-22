@@ -1,4 +1,4 @@
-=== Advanced Excerpt ===
+=== WP CN Excerpt ===
 Contributors:Joychao
 Tags: chinese,cn,excerpt, advanced, post, posts, template, formatting
 Donate link: https://me.alipay.com/joychao

@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name:WP CN Excerpt
-Plugin URI: http://basvd.com/code/advanced-excerpt/
-Description: 支持中文的摘要显示的自动文章缩略插件，基于Advanced Excerpt改版
+Plugin URI: http://www.joychao.cc
+Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示,基于Advance Excerpt修改
 Version: 4.1.1
 Author: Joychao
 Author URI: http://www.joychao.cc
@@ -319,6 +319,7 @@ if (!class_exists('AdvancedExcerpt')):
     <h2><?php
       _e("中文摘要设置", $this->text_domain);
 ?></h2>
+    <div style="height:50px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc; font-family:Microsoft YaHei; font-size:22px;">汉化：By <a href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" />@Joychao</a></div>
     <form method="post" action="">
     <?php
       if (function_exists('wp_nonce_field'))
