@@ -7,6 +7,14 @@ Tested up to: 3.3
 Stable tag: 4.1.1
 
 == Description ==
+ WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示,基于Advance Excerpt修改.
+在摘要中支持HTML标签的显示；
+自动裁剪的摘要功能；
+可以自己定制摘要的长度和省略号的显示；
+"Read More"标签会被自动的添加；
+摘要长度是真是的内容的长度（不包含HTML标签）；
+主题开发者可以使用the_advanced_expert()方法进行更多的控制。
+这个插件可以完美的支持自动中文摘要，而且不局限于生成中文摘要，所有的UNICODE字符都支持。
 
 This plugin adds several improvements to WordPress' default way of creating excerpts.
 
