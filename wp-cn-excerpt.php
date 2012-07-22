@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: CN Excerpt
+Plugin Name:WP CN Excerpt
 Plugin URI: http://basvd.com/code/advanced-excerpt/
 Description: 支持中文的摘要显示的自动文章缩略插件，基于Advanced Excerpt改版
 Version: 4.1.1
