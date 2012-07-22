@@ -474,7 +474,7 @@ if (!class_exists('AdvancedExcerpt')):
 
     public function add_pages()
     {
-      $options_page = add_options_page(__("中文摘要设置", $this->text_domain), __("摘要设置", $this->text_domain), 'manage_options', 'options-' . $this->name, array(
+      $options_page = add_options_page(__("中文摘要设置", $this->text_domain), __("中文摘要设置", $this->text_domain), 'manage_options', 'options-' . $this->name, array(
         &$this,
         'page_options'
       ));
