@@ -468,7 +468,7 @@ if (!class_exists('AdvancedExcerpt')):
 
     public function page_script()
     {
-      wp_enqueue_script($this->name . '_script', WP_PLUGIN_URL . '/wp-cn-excerpt/wp-cn-excerpt.js', array(
+      wp_enqueue_script($this->name . '_script', WP_PLUGIN_URL . '/cn-excerpt/wp-cn-excerpt.js', array(
         'jquery'
       ));
     }
