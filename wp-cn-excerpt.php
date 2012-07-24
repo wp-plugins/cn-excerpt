@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.1
+Version: 4.1.2
 Author: Joychao
 Author URI: http://www.joychao.cc
 
@@ -468,7 +468,7 @@ if (!class_exists('AdvancedExcerpt')):
 
     public function page_script()
     {
-      wp_enqueue_script($this->name . '_script', WP_PLUGIN_URL . '/advanced-excerpt/advanced-excerpt.js', array(
+      wp_enqueue_script($this->name . '_script', WP_PLUGIN_URL . '/wp-cn-excerpt/wp-cn-excerpt.js', array(
         'jquery'
       ));
     }

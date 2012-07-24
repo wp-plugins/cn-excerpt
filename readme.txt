@@ -4,7 +4,7 @@ Tags: chinese,cn,excerpt, advanced, post, posts, template, formatting
 Donate link: https://me.alipay.com/joychao
 Requires at least: 3.2
 Tested up to: 3.3
-Stable tag: 4.1.1
+Stable tag: 4.1.2
 
 == Description ==
  WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示,基于Advance Excerpt修改.
