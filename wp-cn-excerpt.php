@@ -333,7 +333,7 @@ if (!class_exists('AdvancedExcerpt')):
                 <td>
                     <input name="<?php echo $this->name; ?>_length" type="text"
                            id="<?php echo $this->name; ?>_length"
-                           value="<?php echo $length; ?>" size="2"/>
+                           value="<?php echo $length; ?>" size="2"/>个字符
                     <!--<input name="<?php echo $this->name; ?>_use_words" type="checkbox"
                            id="<?php echo $this->name; ?>_use_words" value="on"<?php
                            echo (1 == $use_words) ? ' checked="checked"' : ''; ?>/>
