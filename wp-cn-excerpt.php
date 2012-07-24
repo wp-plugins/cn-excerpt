@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.2
+Version: 4.1.3
 Author: Joychao
 Author URI: http://www.joychao.cc
 
@@ -334,10 +334,10 @@ if (!class_exists('AdvancedExcerpt')):
                     <input name="<?php echo $this->name; ?>_length" type="text"
                            id="<?php echo $this->name; ?>_length"
                            value="<?php echo $length; ?>" size="2"/>
-                    <input name="<?php echo $this->name; ?>_use_words" type="checkbox"
+                    <!--<input name="<?php echo $this->name; ?>_use_words" type="checkbox"
                            id="<?php echo $this->name; ?>_use_words" value="on"<?php
                            echo (1 == $use_words) ? ' checked="checked"' : ''; ?>/>
-                           <?php _e("按词语切割（中文不支持,可忽略）", $this->text_domain); ?>
+                           <?php _e("按词语切割（中文不支持,可忽略）", $this->text_domain); ?>-->
                 </td>
             </tr>
             <tr valign="top">
@@ -352,7 +352,7 @@ if (!class_exists('AdvancedExcerpt')):
                     <?php _e("将会替代文章的摘要显示.", $this->text_domain); ?>
                 </td>
             </tr>
-            <tr valign="top">
+            <!-- <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_length">
                 <?php _e("结束：", $this->text_domain); ?></label></th>
                 <td>
@@ -367,7 +367,7 @@ if (!class_exists('AdvancedExcerpt')):
                     <br />
                     <?php _e("以一个单词或段落结束，此设置可能会让摘要超过预期长度。", $this->text_domain); ?>
                 </td>
-            </tr>
+            </tr> -->
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_read_more">
                 <?php  _e("&lsquo;阅读全文&rsquo; 文本:", $this->text_domain); ?></label></th>
@@ -380,7 +380,7 @@ if (!class_exists('AdvancedExcerpt')):
                            <?php _e("添加此链接到摘要结尾", $this->text_domain); ?>
                 </td>
             </tr>
-            <tr valign="top">
+           <!--  <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_no_custom">
                 <?php _e("没有自定义摘要:", $this->text_domain); ?></label></th>
                 <td>
@@ -389,7 +389,7 @@ if (!class_exists('AdvancedExcerpt')):
                            echo (1 == $no_custom) ? 'checked="checked" ' : ''; ?>/>
                            <?php _e("无论如何都摘要显示，即使原文已经添加了分页标签。", $this->text_domain); ?>
                 </td>
-            </tr>
+            </tr> -->
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_no_shortcode">
                 <?php _e("过滤掉短标签：", $this->text_domain); ?></label></th>
