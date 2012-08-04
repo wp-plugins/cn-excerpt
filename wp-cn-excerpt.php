@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.3
+Version: 4.1.4
 Author: Joychao
 Author URI: http://www.joychao.cc
 
@@ -459,6 +459,7 @@ if (!class_exists('AdvancedExcerpt')):
                 </td>
             </tr>
         </table>
+        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 如果保存后无法见到效果，可能你需要修改主题（<?php bloginfo('template_url')?>/<span style="color:red;">index.php</span>）中显示文章内容部分，一般为"<span style="color:red;">the_content()</span>"修改为"<span style="color:blue;">the_excerpt()</span>"即可。</span></div>
         <p class="submit"><input type="submit" name="Submit" class="button-primary"
                                  value="<?php _e("保存设置", $this->text_domain); ?>" /></p>
     </form>
