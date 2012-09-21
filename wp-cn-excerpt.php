@@ -3,26 +3,12 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.4
+Version: 4.1.5
 Author: Joychao
 Author URI: http://www.joychao.cc
-
 Copyright 2012 Joychao
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+========================本插件修改自：Advanced excerpt by Bas van Doren(http://basvd.com/)==========================
 */
-
 if (!class_exists('AdvancedExcerpt')):
   class AdvancedExcerpt
   {
@@ -31,15 +17,15 @@ if (!class_exists('AdvancedExcerpt')):
     public $text_domain;
     public $options;
     public $default_options = array(
-      'length' => 40,
+      'length' => 100,
       'use_words' => 1,
       'no_custom' => 1,
       'no_shortcode' => 1,
       'finish_word' => 0,
       'finish_sentence' => 0,
       'ellipsis' => '&hellip;',
-      'read_more' => 'Read the rest',
-      'add_link' => 0,
+      'read_more' => '阅读全文',
+      'add_link' => 1,
       'allowed_tags' => array('_all')
     );
     
@@ -83,27 +69,18 @@ if (!class_exists('AdvancedExcerpt')):
       $this->name = strtolower(get_class());
       $this->text_domain = $this->name;
       $this->load_options();
-      
       load_plugin_textdomain($this->text_domain, false, dirname(plugin_basename(__FILE__)));
-      register_activation_hook(__FILE__, array(
-        &$this,
-        'install'
-      ));
+      register_activation_hook(__FILE__, array(&$this, 'install'));
       //register_deactivation_hook($file, array(&$this, 'uninstall'));
 
-      add_action('admin_menu', array(
-        &$this,
-        'add_pages'
-      ));
+      add_action('admin_menu', array(&$this,'add_pages' ));
 
       // Replace the default filter (see /wp-includes/default-filters.php)
-      //remove_filter('get_the_excerpt', 'wp_trim_excerpt');
+      //remove_filter('get_the_content', 'wp_trim_excerpt');
       // Replace everything
-      remove_all_filters('get_the_excerpt');
-      add_filter('get_the_excerpt', array(
-        &$this,
-        'filter'
-      ));
+      remove_all_filters('get_the_content');
+
+      add_filter('the_content', array(&$this,'filter'));
     }
 
     public function filter($text)
@@ -115,16 +92,11 @@ if (!class_exists('AdvancedExcerpt')):
         $this->options = null; // Reset
       }
       extract($this->default_options, EXTR_SKIP);
-      
-      // Avoid custom excerpts
-      if (!empty($text) && !$no_custom)
-        return $text;
-
       // Get the full content and filter it
       $text = get_the_content('');
       if (1 == $no_shortcode)
         $text = strip_shortcodes($text);
-      $text = apply_filters('the_content', $text);
+      $text = apply_filters('get_the_content', $text);
 
       // From the default wp_trim_excerpt():
       // Some kind of precaution against malformed CDATA in RSS feeds I suppose
@@ -352,22 +324,6 @@ if (!class_exists('AdvancedExcerpt')):
                     <?php _e("将会替代文章的摘要显示.", $this->text_domain); ?>
                 </td>
             </tr>
-            <!-- <tr valign="top">
-                <th scope="row"><label for="<?php echo $this->name; ?>_length">
-                <?php _e("结束：", $this->text_domain); ?></label></th>
-                <td>
-                    <input name="<?php echo $this->name; ?>_finish_word" type="checkbox"
-                           id="<?php echo $this->name; ?>_finish_word" value="on"<?php
-                           echo (1 == $finish_word) ? ' checked="checked"' : ''; ?>/>
-                           <?php _e("单词(不建议)", $this->text_domain); ?><br/>
-                    <input name="<?php echo $this->name; ?>_finish_sentence" type="checkbox"
-                           id="<?php echo $this->name; ?>_finish_sentence" value="on"<?php
-                           echo (1 == $finish_sentence) ? ' checked="checked"' : ''; ?>/>
-                           <?php _e("段落(不建议)", $this->text_domain); ?>
-                    <br />
-                    <?php _e("以一个单词或段落结束，此设置可能会让摘要超过预期长度。", $this->text_domain); ?>
-                </td>
-            </tr> -->
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_read_more">
                 <?php  _e("&lsquo;阅读全文&rsquo; 文本:", $this->text_domain); ?></label></th>
@@ -380,16 +336,6 @@ if (!class_exists('AdvancedExcerpt')):
                            <?php _e("添加此链接到摘要结尾", $this->text_domain); ?>
                 </td>
             </tr>
-           <!--  <tr valign="top">
-                <th scope="row"><label for="<?php echo $this->name; ?>_no_custom">
-                <?php _e("没有自定义摘要:", $this->text_domain); ?></label></th>
-                <td>
-                    <input name="<?php echo $this->name; ?>_no_custom" type="checkbox"
-                           id="<?php echo $this->name; ?>_no_custom" value="on" <?php
-                           echo (1 == $no_custom) ? 'checked="checked" ' : ''; ?>/>
-                           <?php _e("无论如何都摘要显示，即使原文已经添加了分页标签。", $this->text_domain); ?>
-                </td>
-            </tr> -->
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_no_shortcode">
                 <?php _e("过滤掉短标签：", $this->text_domain); ?></label></th>
@@ -476,16 +422,12 @@ if (!class_exists('AdvancedExcerpt')):
 
     public function add_pages()
     {
-      $options_page = add_options_page(__("中文摘要设置", $this->text_domain), __("中文摘要设置", $this->text_domain), 'manage_options', 'options-' . $this->name, array(
-        &$this,
-        'page_options'
+      $options_page = add_options_page(__("中文摘要设置", $this->text_domain),
+       __("中文摘要设置", $this->text_domain), 'manage_options', 'options-' . $this->name, array(&$this,'page_options'
       ));
 
       // Scripts
-      add_action('admin_print_scripts-' . $options_page, array(
-        &$this,
-        'page_script'
-      ));
+      add_action('admin_print_scripts-' . $options_page, array(&$this,'page_script'));
     }
   }
   
@@ -514,7 +456,7 @@ if (!class_exists('AdvancedExcerpt')):
     AdvancedExcerpt::Instance()->options = $args;
     
     if ($get)
-      return get_the_excerpt();
+      return get_the_content();
     else
       the_excerpt();
   }
