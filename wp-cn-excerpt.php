@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.5
+Version: 4.1.6
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -38,7 +38,6 @@ if (!class_exists('AdvancedExcerpt')):
       'li', 'ol', 'p', 'pre', 'q', 's', 'small', 'span', 'strike', 'strong', 'sub',
       'sup', 'table', 'td', 'th', 'tr', 'u', 'ul'
     );
-
     // Almost all HTML tags (extra options)
     public static $options_all_tags = array(
       'a', 'abbr', 'acronym', 'address', 'applet',
@@ -72,19 +71,18 @@ if (!class_exists('AdvancedExcerpt')):
       load_plugin_textdomain($this->text_domain, false, dirname(plugin_basename(__FILE__)));
       register_activation_hook(__FILE__, array(&$this, 'install'));
       //register_deactivation_hook($file, array(&$this, 'uninstall'));
-
       add_action('admin_menu', array(&$this,'add_pages' ));
-
       // Replace the default filter (see /wp-includes/default-filters.php)
       //remove_filter('get_the_content', 'wp_trim_excerpt');
       // Replace everything
       remove_all_filters('get_the_content');
-
       add_filter('the_content', array(&$this,'filter'));
     }
-
     public function filter($text)
     {
+      if(is_single() or is_page()){
+        return $text;
+      }
       // Extract options (skip collisions)
       if (is_array($this->options))
       {
@@ -97,11 +95,9 @@ if (!class_exists('AdvancedExcerpt')):
       if (1 == $no_shortcode)
         $text = strip_shortcodes($text);
       $text = apply_filters('get_the_content', $text);
-
       // From the default wp_trim_excerpt():
       // Some kind of precaution against malformed CDATA in RSS feeds I suppose
       $text = str_replace(']]>', ']]&gt;', $text);
-
       // Determine allowed tags
       if(!isset($allowed_tags))
         $allowed_tags = self::$options_all_tags;
@@ -118,13 +114,10 @@ if (!class_exists('AdvancedExcerpt')):
           $tag_string = '';
         $text = strip_tags($text, $tag_string);
       }
-
       // Create the excerpt
       $text = $this->text_excerpt($text, $length, $use_words, $finish_word, $finish_sentence);
-
       // Add the ellipsis or link
       $text = $this->text_add_more($text, $ellipsis, ($add_link) ? $read_more : false);
-
       return $text;
     }
     
@@ -195,7 +188,6 @@ if (!class_exists('AdvancedExcerpt')):
         if($suffix) return $slice."…";  
         return $slice;
    } 
-
     public function text_add_more($text, $ellipsis, $read_more)
     {
       // New filter in WP2.9, seems unnecessary for now
@@ -203,7 +195,6 @@ if (!class_exists('AdvancedExcerpt')):
       
       if ($read_more)
         $ellipsis .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), $read_more);
-
       $pos = strrpos($text, '</');
       if ($pos !== false)
         // Inside last HTML tag
@@ -214,7 +205,6 @@ if (!class_exists('AdvancedExcerpt')):
       
       return $text;
     }
-
     public function install()
     {
       foreach($this->default_options as $k => $v)
@@ -222,12 +212,10 @@ if (!class_exists('AdvancedExcerpt')):
         add_option($this->name . '_' . $k, $v);
       }
     }
-
     public function uninstall()
     {
       // Nothing to do (note: deactivation hook is also disabled)
     }
-
     private function load_options()
     {
       foreach($this->default_options as $k => $v)
@@ -235,7 +223,6 @@ if (!class_exists('AdvancedExcerpt')):
         $this->default_options[$k] = get_option($this->name . '_' . $k, $v);
       }
     }
-
     private function update_options()
     {
       $length       = (int) $_POST[$this->name . '_length'];
@@ -245,13 +232,10 @@ if (!class_exists('AdvancedExcerpt')):
       $finish_word     = ('on' == $_POST[$this->name . '_finish_word']) ? 1 : 0;
       $finish_sentence = ('on' == $_POST[$this->name . '_finish_sentence']) ? 1 : 0;
       $add_link     = ('on' == $_POST[$this->name . '_add_link']) ? 1 : 0;
-
       // TODO: Drop magic quotes (deprecated in php 5.3)
       $ellipsis  = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_ellipsis']) : $_POST[$this->name . '_ellipsis'];
       $read_more = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_read_more']) : $_POST[$this->name . '_read_more'];
-
       $allowed_tags = array_unique((array) $_POST[$this->name . '_allowed_tags']);
-
       update_option($this->name . '_length', $length);
       update_option($this->name . '_use_words', $use_words);
       update_option($this->name . '_no_custom', $no_custom);
@@ -262,13 +246,11 @@ if (!class_exists('AdvancedExcerpt')):
       update_option($this->name . '_read_more', $read_more);
       update_option($this->name . '_add_link', $add_link);
       update_option($this->name . '_allowed_tags', $allowed_tags);
-
       $this->load_options();
 ?>
         <div id="message" class="updated fade"><p>Options saved.</p></div>
     <?php
     }
-
     public function page_options()
     {
       if ('POST' == $_SERVER['REQUEST_METHOD'])
@@ -276,12 +258,9 @@ if (!class_exists('AdvancedExcerpt')):
         check_admin_referer($this->name . '_update_options');
         $this->update_options();
       }
-
       extract($this->default_options, EXTR_SKIP);
-
       $ellipsis  = htmlentities($ellipsis);
       $read_more = $read_more;
-
       $tag_list = array_unique(self::$options_basic_tags + $allowed_tags);
       sort($tag_list);
       $tag_cols = 5;
@@ -297,7 +276,6 @@ if (!class_exists('AdvancedExcerpt')):
       if (function_exists('wp_nonce_field'))
         wp_nonce_field($this->name . '_update_options');
 ?>
-
         <table class="form-table">
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_length">
@@ -412,41 +390,34 @@ if (!class_exists('AdvancedExcerpt')):
 </div>
 <?php
     }
-
     public function page_script()
     {
       wp_enqueue_script($this->name . '_script', WP_PLUGIN_URL . '/cn-excerpt/wp-cn-excerpt.js', array(
         'jquery'
       ));
     }
-
     public function add_pages()
     {
       $options_page = add_options_page(__("中文摘要设置", $this->text_domain),
        __("中文摘要设置", $this->text_domain), 'manage_options', 'options-' . $this->name, array(&$this,'page_options'
       ));
-
       // Scripts
       add_action('admin_print_scripts-' . $options_page, array(&$this,'page_script'));
     }
   }
   
   AdvancedExcerpt::Instance();
-
   // Do not use outside the Loop!
   function the_advanced_excerpt($args = '', $get = false)
   {
     if (!empty($args) && !is_array($args))
     {
       $args = wp_parse_args($args);
-
       // Parse query style parameters
       if (isset($args['ellipsis']))
         $args['ellipsis'] = urldecode($args['ellipsis']);
-
       if (isset($args['allowed_tags']))
         $args['allowed_tags'] = preg_split('/[\s,]+/', $args['allowed_tags']);
-
       if (isset($args['exclude_tags']))
       {
         $args['exclude_tags'] = preg_split('/[\s,]+/', $args['exclude_tags']);
