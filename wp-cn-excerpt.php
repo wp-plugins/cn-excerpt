@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.6
+Version: 4.1.7
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -19,7 +19,7 @@ if (!class_exists('AdvancedExcerpt')):
     public $default_options = array(
       'length' => 100,
       'use_words' => 1,
-      'no_custom' => 1,
+      'only_excerpt' => 0,
       'no_shortcode' => 1,
       'finish_word' => 0,
       'finish_sentence' => 0,
@@ -76,7 +76,8 @@ if (!class_exists('AdvancedExcerpt')):
       //remove_filter('get_the_content', 'wp_trim_excerpt');
       // Replace everything
       remove_all_filters('get_the_content');
-      add_filter('the_content', array(&$this,'filter'));
+      $contentType=$this->default_options['only_excerpt']?'the_excerpt':'the_content';//显示时机
+      add_filter($contentType, array(&$this,'filter'));
     }
     public function filter($text)
     {
@@ -227,7 +228,7 @@ if (!class_exists('AdvancedExcerpt')):
     {
       $length       = (int) $_POST[$this->name . '_length'];
       $use_words    = ('on' == $_POST[$this->name . '_use_words']) ? 1 : 0;
-      $no_custom    = ('on' == $_POST[$this->name . '_no_custom']) ? 1 : 0;
+      $only_excerpt    = ('on' == $_POST[$this->name . '_only_excerpt']) ? 1 : 0;
       $no_shortcode = ('on' == $_POST[$this->name . '_no_shortcode']) ? 1 : 0;
       $finish_word     = ('on' == $_POST[$this->name . '_finish_word']) ? 1 : 0;
       $finish_sentence = ('on' == $_POST[$this->name . '_finish_sentence']) ? 1 : 0;
@@ -238,7 +239,7 @@ if (!class_exists('AdvancedExcerpt')):
       $allowed_tags = array_unique((array) $_POST[$this->name . '_allowed_tags']);
       update_option($this->name . '_length', $length);
       update_option($this->name . '_use_words', $use_words);
-      update_option($this->name . '_no_custom', $no_custom);
+      update_option($this->name . '_only_excerpt', $only_excerpt);
       update_option($this->name . '_no_shortcode', $no_shortcode);
       update_option($this->name . '_finish_word', $finish_word);
       update_option($this->name . '_finish_sentence', $finish_sentence);
@@ -270,13 +271,23 @@ if (!class_exists('AdvancedExcerpt')):
     <h2><?php
       _e("中文摘要设置", $this->text_domain);
 ?></h2>
-    <div style="height:50px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc; font-family:Microsoft YaHei; font-size:22px;">汉化：By <a href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" />@Joychao</a></div>
+    <div style="height:50px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc; font-family:Microsoft YaHei; font-size:22px;">作者：<a href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" style="vertical-align:-8px;"  />@安正超</a>   如果您觉得不错，您可以选择资助我：<a href="https://me.alipay.com/joychao" target="_blank"><img src="<?php echo WP_PLUGIN_URL;?>/cn-excerpt/alipay.png" style="vertical-align:-10px;" /></a></div>
     <form method="post" action="">
     <?php
       if (function_exists('wp_nonce_field'))
         wp_nonce_field($this->name . '_update_options');
 ?>
         <table class="form-table">
+          <tr valign="top">
+                <th scope="row"><label for="<?php echo $this->name; ?>_only_excerpt">
+                <?php _e("摘要显示情况：", $this->text_domain); ?></label></th>
+                <td>
+                    <input name="<?php echo $this->name; ?>_only_excerpt" type="checkbox"
+                           id="<?php echo $this->name; ?>_only_excerpt" value="on" <?php
+                           echo (1 == $only_excerpt) ? 'checked="checked" ' : ''; ?>/>
+                           <?php _e("当模板里使用 the_excerpt 时显示才摘要(不清楚这是什么建议不选)", $this->text_domain); ?>
+                </td>
+            </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_length">
                 <?php _e("摘要长度:", $this->text_domain); ?></label></th>
@@ -297,9 +308,9 @@ if (!class_exists('AdvancedExcerpt')):
                     <input name="<?php echo $this->name; ?>_ellipsis" type="text"
                            id="<?php echo $this->name; ?>_ellipsis"
                            value="<?php echo $ellipsis; ?>" size="15"/>
-                    <?php _e('(使用 <a href="http://www.w3schools.com/tags/ref_entities.asp">HTML 实体</a>)', $this->text_domain); ?>
+                    <?php _e('(使用 <a href="http://www.joychao.cc/769.html" target="_blank">HTML 实体</a>)', $this->text_domain); ?>
                     <br />
-                    <?php _e("将会替代文章的摘要显示.", $this->text_domain); ?>
+                    <?php _e("将会替代文章的摘要显示.默认为省略号“...”", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
@@ -383,7 +394,7 @@ if (!class_exists('AdvancedExcerpt')):
                 </td>
             </tr>
         </table>
-        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 如果保存后无法见到效果，可能你需要修改主题（<?php bloginfo('template_url')?>/<span style="color:red;">index.php</span>）中显示文章内容部分，一般为"<span style="color:red;">the_content()</span>"修改为"<span style="color:blue;">the_excerpt()</span>"即可。</span></div>
+        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 使用过程中有任何问题，欢迎到<a href="http://www.joychao.cc/692.html" target="_blank">我的博客</a>留言，我会在最短的时间内尽可能的解决您的问题,感谢您的支持！</div>
         <p class="submit"><input type="submit" name="Submit" class="button-primary"
                                  value="<?php _e("保存设置", $this->text_domain); ?>" /></p>
     </form>
