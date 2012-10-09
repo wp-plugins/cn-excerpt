@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.7
+Version: 4.1.8
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -19,7 +19,7 @@ if (!class_exists('AdvancedExcerpt')):
     public $default_options = array(
       'length' => 100,
       'use_words' => 1,
-      'only_excerpt' => 0,
+      'only_excerpt' => 1,
       'no_shortcode' => 1,
       'finish_word' => 0,
       'finish_sentence' => 0,
@@ -75,9 +75,9 @@ if (!class_exists('AdvancedExcerpt')):
       // Replace the default filter (see /wp-includes/default-filters.php)
       //remove_filter('get_the_content', 'wp_trim_excerpt');
       // Replace everything
-      remove_all_filters('get_the_content');
+      remove_all_filters('get_the_content',100);
       $contentType=$this->default_options['only_excerpt']?'the_excerpt':'the_content';//显示时机
-      add_filter($contentType, array(&$this,'filter'));
+      add_filter($contentType, array(&$this,'filter'),100);
     }
     public function filter($text)
     {
@@ -228,7 +228,7 @@ if (!class_exists('AdvancedExcerpt')):
     {
       $length       = (int) $_POST[$this->name . '_length'];
       $use_words    = ('on' == $_POST[$this->name . '_use_words']) ? 1 : 0;
-      $only_excerpt    = ('on' == $_POST[$this->name . '_only_excerpt']) ? 1 : 0;
+      $only_excerpt    = ('on' == $_POST[$this->name . '_only_excerpt']) ? 0 : 1;
       $no_shortcode = ('on' == $_POST[$this->name . '_no_shortcode']) ? 1 : 0;
       $finish_word     = ('on' == $_POST[$this->name . '_finish_word']) ? 1 : 0;
       $finish_sentence = ('on' == $_POST[$this->name . '_finish_sentence']) ? 1 : 0;
@@ -266,35 +266,72 @@ if (!class_exists('AdvancedExcerpt')):
       sort($tag_list);
       $tag_cols = 5;
 ?>
-<div class="wrap">
+<div class="wrap" style=" font-family:Microsoft YaHei; ">
     <div id="icon-options-general" class="icon32"><br /></div>
     <h2><?php
       _e("中文摘要设置", $this->text_domain);
 ?></h2>
-    <div style="height:50px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc; font-family:Microsoft YaHei; font-size:22px;">作者：<a href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" style="vertical-align:-8px;"  />@安正超</a>   如果您觉得不错，您可以选择资助我：<a href="https://me.alipay.com/joychao" target="_blank"><img src="<?php echo WP_PLUGIN_URL;?>/cn-excerpt/alipay.png" style="vertical-align:-10px;" /></a></div>
+    <div style="height:100px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;font-size:22px;"><div>作者：<a style="text-decoration:none;" href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a  style="text-decoration:none;" href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" style="vertical-align:-8px;"  />@安正超</a>  捐赠链接：<a href="https://me.alipay.com/joychao" target="_blank"><img src="<?php echo WP_PLUGIN_URL;?>/cn-excerpt/alipay.png" style="vertical-align:-10px;" /></a></div>
+<!-- Baidu Button BEGIN -->
+    <div style="font-size:22px;height:50px; float:left; line-height:50px;">推荐给你的朋友们吧！</div><div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare" data="{'url':'http://www.joychao.cc/692.html'}">
+       <a class="bds_qzone"></a>
+        <a class="bds_tsina"></a>
+        <a class="bds_tqq"></a>
+        <a class="bds_renren"></a>
+        <a class="bds_diandian"></a>
+        <a class="bds_meilishuo"></a>
+        <a class="bds_tieba"></a>
+        <a class="bds_douban"></a>
+        <a class="bds_tqf"></a>
+        <a class="bds_kaixin001"></a>
+        <a class="bds_ff"></a>
+        <a class="bds_huaban"></a>
+        <a class="bds_mail"></a>
+        <span class="bds_more">更多</span>
+    <a class="shareCount"></a>
+    </div>
+    </div>
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=533119" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+  /**
+   * 在这里定义bds_config
+   */
+  var bds_config = {
+    'bdDes':'推荐一款强大的wordpress中文摘要插件：http://www.joychao.cc/692.html',    //'请参考自定义分享摘要'
+    'bdText':'给大家推荐一款强大的wordpress中文摘要插件！可选主题内容函数摘要显示，支持各种中文编码。可以说是一个非常理想的wordpress文章摘要插件。详情猛击这里->http://www.joychao.cc/692.html',   //'请参考自定义分享内容'
+    'bdComment':'非常理想的wordpress文章摘要插件',  //'请参考自定义分享评论'
+    'bdPic':'http://www.joychao.cc/wp-content/uploads/2012/07/QQ%E6%88%AA%E5%9B%BE20120930063343.png', //'请参考自定义分享出去的图片'
+    'searchPic':false,
+    'wbUid':'2193182644',   //'请参考自定义微博 id'
+    'snsKey':{'tsina':'4000238328'}   //'请参考自定义分享到平台的appkey'
+  }
+  document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + new Date().getHours();
+</script>
+<!-- Baidu Button END -->
     <form method="post" action="">
     <?php
       if (function_exists('wp_nonce_field'))
         wp_nonce_field($this->name . '_update_options');
 ?>
-        <table class="form-table">
+        <table id="formTable" >
           <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_only_excerpt">
-                <?php _e("摘要显示情况：", $this->text_domain); ?></label></th>
+                <?php _e("显示情况：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_only_excerpt" type="checkbox"
                            id="<?php echo $this->name; ?>_only_excerpt" value="on" <?php
-                           echo (1 == $only_excerpt) ? 'checked="checked" ' : ''; ?>/>
-                           <?php _e("当模板里使用 the_excerpt 时显示才摘要(不清楚这是什么建议不选)", $this->text_domain); ?>
+                           echo (0 == $only_excerpt) ? 'checked="checked" ' : ''; ?>/>
+                           <?php _e("当模板里使用 the_excerpt 和 the_content 时都显示摘要(摘要无效时可以尝试勾选,不清楚这是什么建议不选)", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_length">
-                <?php _e("摘要长度:", $this->text_domain); ?></label></th>
+                <?php _e("摘要长度：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_length" type="text"
                            id="<?php echo $this->name; ?>_length"
-                           value="<?php echo $length; ?>" size="2"/>个字符
+                           value="<?php echo $length; ?>" size="10"/>个字符
                     <!--<input name="<?php echo $this->name; ?>_use_words" type="checkbox"
                            id="<?php echo $this->name; ?>_use_words" value="on"<?php
                            echo (1 == $use_words) ? ' checked="checked"' : ''; ?>/>
@@ -303,19 +340,18 @@ if (!class_exists('AdvancedExcerpt')):
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_ellipsis">
-                <?php _e("省略符号:", $this->text_domain); ?></label></th>
+                <?php _e("省略符号：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_ellipsis" type="text"
                            id="<?php echo $this->name; ?>_ellipsis"
                            value="<?php echo $ellipsis; ?>" size="15"/>
                     <?php _e('(使用 <a href="http://www.joychao.cc/769.html" target="_blank">HTML 实体</a>)', $this->text_domain); ?>
-                    <br />
                     <?php _e("将会替代文章的摘要显示.默认为省略号“...”", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_read_more">
-                <?php  _e("&lsquo;阅读全文&rsquo; 文本:", $this->text_domain); ?></label></th>
+                <?php  _e("链接文本：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_read_more" type="text"
                            id="<?php echo $this->name; ?>_read_more" value="<?php echo $read_more; ?>" />
@@ -327,7 +363,7 @@ if (!class_exists('AdvancedExcerpt')):
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_no_shortcode">
-                <?php _e("过滤掉短标签：", $this->text_domain); ?></label></th>
+                <?php _e("过滤标签：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_no_shortcode" type="checkbox"
                            id="<?php echo $this->name; ?>_no_shortcode" value="on" <?php
@@ -348,6 +384,8 @@ if (!class_exists('AdvancedExcerpt')):
                         </tr>
 <?php
       $i = 0;
+      $j = 0;
+
       foreach ($tag_list as $tag):
         if ($tag == '_all')
           continue;
@@ -361,8 +399,8 @@ if (!class_exists('AdvancedExcerpt')):
                             <td>
     <input name="<?php echo $this->name; ?>_allowed_tags[]" type="checkbox"
            value="<?php echo $tag; ?>" <?php
-           echo (in_array($tag, $allowed_tags)) ? 'checked="checked" ' : ''; ?>/>
-    <code><?php echo $tag; ?></code>
+           echo (in_array($tag, $allowed_tags)) ? 'checked="checked" ' : ''; ?> id="tag<?php echo $j;?>"/>
+    <code><label for="tag<?php echo $j++;?>"><?php echo $tag; ?></label></code>
                             </td>
 <?php
         if (0 == $i % $tag_cols):
@@ -394,10 +432,16 @@ if (!class_exists('AdvancedExcerpt')):
                 </td>
             </tr>
         </table>
-        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 使用过程中有任何问题，欢迎到<a href="http://www.joychao.cc/692.html" target="_blank">我的博客</a>留言，我会在最短的时间内尽可能的解决您的问题,感谢您的支持！</div>
+        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 使用过程中有任何问题，欢迎到<a href="http://www.joychao.cc/692.html" target="_blank">我的博客</a> 留言 或者给我邮件：<strong>joy@joychao.cc</strong>，我会在最短的时间内尽可能的解决您的问题,感谢您的支持！</div>
         <p class="submit"><input type="submit" name="Submit" class="button-primary"
                                  value="<?php _e("保存设置", $this->text_domain); ?>" /></p>
     </form>
+    <style type="text/css">
+    #formTable{ table-layout:fixed;empty-cells:show; border-collapse: collapse; clear: both;}
+    #formTable th{width: 80px; text-align:left;padding: 10px 0;border-bottom: 1px solid #bebebe;}
+    #formTable td{padding: 10px 0; line-height: 2em; border-bottom: 1px solid #bebebe;}
+    #formTable table td{line-height: auto;padding: 0;border-bottom:none;}
+    </style>
 </div>
 <?php
     }
