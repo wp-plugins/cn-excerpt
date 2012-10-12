@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.8
+Version: 4.1.9
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -18,15 +18,13 @@ if (!class_exists('AdvancedExcerpt')):
     public $options;
     public $default_options = array(
       'length' => 100,
-      'use_words' => 1,
       'only_excerpt' => 1,
       'no_shortcode' => 1,
-      'finish_word' => 0,
-      'finish_sentence' => 0,
+      'finish_sentence' => 1,
       'ellipsis' => '&hellip;',
       'read_more' => '阅读全文',
       'add_link' => 1,
-      'allowed_tags' => array('_all')
+      'allowed_tags' => array('_all'),
     );
     
     // Basic HTML tags (determines which tags are in the checklist by default)
@@ -116,13 +114,13 @@ if (!class_exists('AdvancedExcerpt')):
         $text = strip_tags($text, $tag_string);
       }
       // Create the excerpt
-      $text = $this->text_excerpt($text, $length, $use_words, $finish_word, $finish_sentence);
+      $text = $this->text_excerpt($text, $length, $finish_sentence);
       // Add the ellipsis or link
       $text = $this->text_add_more($text, $ellipsis, ($add_link) ? $read_more : false);
       return $text;
     }
     
-    public function text_excerpt($text, $length, $use_words, $finish_word, $finish_sentence)
+    public function text_excerpt($text, $length, $finish_sentence)
     {
       $tokens = array();
       $out = '';
@@ -133,30 +131,19 @@ if (!class_exists('AdvancedExcerpt')):
       preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $text, $tokens);
       foreach ($tokens[0] as $t)
       { // Parse each token
-        if ($w >= $length && !$finish_sentence)
-        { // Limit reached
-          break;
-        }
         if ($t[0] != '<')
         { // Token is not a tag
-          if ($w >= $length && $finish_sentence && preg_match('/[\?\.\!]\s*$/uS', $t) == 1)
+          if ($finish_sentence && preg_match('/[\?\.\!]\s*$/uS', $t) == 1)
           { // Limit reached, continue until ? . or ! occur at the end
             $out .= trim($t);
             break;
           }
-          if (1 == $use_words)
-          { // Count words
-            $w++;
-          } else
-          { // Count/trim characters
-            $chars = trim($t); // Remove surrounding space
-            $c = strlen($chars);
-            if ($c + $w > $length && !$finish_sentence)
-            { // Token is too long
-              $c = ($finish_word) ? $c : $length - $w; // Keep token to finish word
-              $t = $this->msubstr($t, 0, $c);
-            }
-            $w += $c;
+         // Count/trim characters
+          $chars = trim($t); // Remove surrounding space
+          $c = strlen($chars);
+          if ($c > $length && !$finish_sentence)
+          { // Token is too long
+            $t = $this->msubstr($t, 0, $c);
           }
         }
         // Append what's left of the token
@@ -191,19 +178,9 @@ if (!class_exists('AdvancedExcerpt')):
    } 
     public function text_add_more($text, $ellipsis, $read_more)
     {
-      // New filter in WP2.9, seems unnecessary for now
-      //$ellipsis = apply_filters('excerpt_more', $ellipsis);
-      
       if ($read_more)
-        $ellipsis .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), $read_more);
-      $pos = strrpos($text, '</');
-      if ($pos !== false)
-        // Inside last HTML tag
-        $text = substr_replace($text, $ellipsis, $pos, 0);
-      else
         // After the content
-        $text .= $ellipsis;
-      
+        $text .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), $read_more);
       return $text;
     }
     public function install()
@@ -227,10 +204,8 @@ if (!class_exists('AdvancedExcerpt')):
     private function update_options()
     {
       $length       = (int) $_POST[$this->name . '_length'];
-      $use_words    = ('on' == $_POST[$this->name . '_use_words']) ? 1 : 0;
       $only_excerpt    = ('on' == $_POST[$this->name . '_only_excerpt']) ? 0 : 1;
       $no_shortcode = ('on' == $_POST[$this->name . '_no_shortcode']) ? 1 : 0;
-      $finish_word     = ('on' == $_POST[$this->name . '_finish_word']) ? 1 : 0;
       $finish_sentence = ('on' == $_POST[$this->name . '_finish_sentence']) ? 1 : 0;
       $add_link     = ('on' == $_POST[$this->name . '_add_link']) ? 1 : 0;
       // TODO: Drop magic quotes (deprecated in php 5.3)
@@ -238,10 +213,8 @@ if (!class_exists('AdvancedExcerpt')):
       $read_more = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_read_more']) : $_POST[$this->name . '_read_more'];
       $allowed_tags = array_unique((array) $_POST[$this->name . '_allowed_tags']);
       update_option($this->name . '_length', $length);
-      update_option($this->name . '_use_words', $use_words);
       update_option($this->name . '_only_excerpt', $only_excerpt);
       update_option($this->name . '_no_shortcode', $no_shortcode);
-      update_option($this->name . '_finish_word', $finish_word);
       update_option($this->name . '_finish_sentence', $finish_sentence);
       update_option($this->name . '_ellipsis', $ellipsis);
       update_option($this->name . '_read_more', $read_more);
@@ -249,7 +222,7 @@ if (!class_exists('AdvancedExcerpt')):
       update_option($this->name . '_allowed_tags', $allowed_tags);
       $this->load_options();
 ?>
-        <div id="message" class="updated fade"><p>Options saved.</p></div>
+        <div id="message" class="updated fade"><p>设置已保存</p></div>
     <?php
     }
     public function page_options()
@@ -332,10 +305,6 @@ if (!class_exists('AdvancedExcerpt')):
                     <input name="<?php echo $this->name; ?>_length" type="text"
                            id="<?php echo $this->name; ?>_length"
                            value="<?php echo $length; ?>" size="10"/>个字符
-                    <!--<input name="<?php echo $this->name; ?>_use_words" type="checkbox"
-                           id="<?php echo $this->name; ?>_use_words" value="on"<?php
-                           echo (1 == $use_words) ? ' checked="checked"' : ''; ?>/>
-                           <?php _e("按词语切割（中文不支持,可忽略）", $this->text_domain); ?>-->
                 </td>
             </tr>
             <tr valign="top">
