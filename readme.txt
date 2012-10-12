@@ -4,7 +4,7 @@ Tags: chinese,cn,excerpt, advanced, post, posts, template, formatting
 Donate link: https://me.alipay.com/joychao
 Requires at least: 3.2
 Tested up to: 3.4.2
-Stable tag: 4.1.9
+Stable tag: 4.2.0
 
 
 == Description ==

@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.1.9
+Version: 4.2.0
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -20,7 +20,7 @@ if (!class_exists('AdvancedExcerpt')):
       'length' => 100,
       'only_excerpt' => 1,
       'no_shortcode' => 1,
-      'finish_sentence' => 1,
+      'finish_sentence' => 0,
       'ellipsis' => '&hellip;',
       'read_more' => '阅读全文',
       'add_link' => 1,
@@ -124,32 +124,29 @@ if (!class_exists('AdvancedExcerpt')):
     {
       $tokens = array();
       $out = '';
-      $w = 0;
+      $c = 0;
       
-      // Divide the string into tokens; HTML tags, or words, followed by any whitespace
-      // (<[^>]+>|[^<>\s]+\s*)
-      preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $text, $tokens);
-      foreach ($tokens[0] as $t)
-      { // Parse each token
-        if ($t[0] != '<')
-        { // Token is not a tag
-          if ($finish_sentence && preg_match('/[\?\.\!！；。“‘"\']\s*$/uS', $t) == 1)//以句子结束
-          { // Limit reached, continue until ? . or ! occur at the end
-            $out .= trim($t);
-            break;
+      //如果是以第一段结束
+      if($finish_sentence){
+        // Divide the string into tokens; HTML tags, or words, followed by any whitespace
+        // (<[^>]+>|[^<>\s]+\s*)
+        preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $text, $tokens);
+        foreach ($tokens[0] as $t)
+        { // Parse each token
+          if ($t[0] != '<')
+          { // Token is not a tag
+            if (preg_match('/[\?\.\!！。"“’\']\s*$/uS', $t) == 1)//以句子结束
+            { // Limit reached, continue until ? . or ! occur at the end
+              $out .= trim($t);
+              break;
+            }
           }
-         // Count/trim characters
-          $chars = trim($t); // Remove surrounding space
-          $c = strlen($chars);
-          if ($c > $length && !$finish_sentence)
-          { // Token is too long
-            $t = $this->msubstr($t, 0, $c);
-          }
+          // Append what's left of the token
+          $out .= $t;
         }
-        // Append what's left of the token
-        $out .= $t;
+      }else{
+        $out = $this->msubstr($text,0,$length);
       }
-      
       return trim(force_balance_tags($out));
     }
     
@@ -300,12 +297,12 @@ if (!class_exists('AdvancedExcerpt')):
             </tr>
             <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_only_excerpt">
-                <?php _e("结束情况：", $this->text_domain); ?></label></th>
+                <?php _e("首段摘要：", $this->text_domain); ?></label></th>
                 <td>
                     <input name="<?php echo $this->name; ?>_finish_sentence" type="checkbox"
                            id="<?php echo $this->name; ?>_finish_sentence" value="on" <?php
                            echo (1 == $finish_sentence) ? 'checked="checked" ' : ''; ?>/>
-                           <?php _e("以句子结束，也就是不断句（条件为?。！!;”’,\"'等符号结束）", $this->text_domain); ?>
+                           <?php _e("设置第一段为摘要（条件为?。！!;”’,\"'等符号结束）", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
