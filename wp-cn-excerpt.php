@@ -133,7 +133,7 @@ if (!class_exists('AdvancedExcerpt')):
       { // Parse each token
         if ($t[0] != '<')
         { // Token is not a tag
-          if ($finish_sentence && preg_match('/[\?\.\!]\s*$/uS', $t) == 1)
+          if ($finish_sentence && preg_match('/[\?\.\!！；。“‘"\']\s*$/uS', $t) == 1)//以句子结束
           { // Limit reached, continue until ? . or ! occur at the end
             $out .= trim($t);
             break;
@@ -296,6 +296,16 @@ if (!class_exists('AdvancedExcerpt')):
                            id="<?php echo $this->name; ?>_only_excerpt" value="on" <?php
                            echo (0 == $only_excerpt) ? 'checked="checked" ' : ''; ?>/>
                            <?php _e("当模板里使用 the_excerpt 和 the_content 时都显示摘要(摘要无效时可以尝试勾选,不清楚这是什么建议不选)", $this->text_domain); ?>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row"><label for="<?php echo $this->name; ?>_only_excerpt">
+                <?php _e("结束情况：", $this->text_domain); ?></label></th>
+                <td>
+                    <input name="<?php echo $this->name; ?>_finish_sentence" type="checkbox"
+                           id="<?php echo $this->name; ?>_finish_sentence" value="on" <?php
+                           echo (1 == $finish_sentence) ? 'checked="checked" ' : ''; ?>/>
+                           <?php _e("以句子结束，也就是不断句（条件为?。！!;”’,\"'等符号结束）", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
