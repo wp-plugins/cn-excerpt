@@ -302,7 +302,7 @@ if (!class_exists('AdvancedExcerpt')):
                     <input name="<?php echo $this->name; ?>_finish_sentence" type="checkbox"
                            id="<?php echo $this->name; ?>_finish_sentence" value="on" <?php
                            echo (1 == $finish_sentence) ? 'checked="checked" ' : ''; ?>/>
-                           <?php _e("设置第一段为摘要（条件为?。！!;”’,\"'等符号结束）", $this->text_domain); ?>
+                           <?php _e("设置第一段为摘要，不按字数切割（条件为?。！!;”’,\"'等符号结束）", $this->text_domain); ?>
                 </td>
             </tr>
             <tr valign="top">
