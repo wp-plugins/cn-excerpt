@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.2.1
+Version: 4.2.2
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -131,12 +131,13 @@ if (!class_exists('AdvancedExcerpt')):
         // Divide the string into tokens; HTML tags, or words, followed by any whitespace
         // (<[^>]+>|[^<>\s]+\s*)
         preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $text, $tokens);
-        foreach ($tokens[0] as $t)
+        var_dump($tokens);
+        foreach ($tokens[1] as $t)
         { // Parse each token
           if ($t[0] != '<')
           { // Token is not a tag
-            if (preg_match('/[\?\.\!！。"“’\']\s*$/uS', $t) == 1)//以句子结束
-            { // Limit reached, continue until ? . or ! occur at the end
+            if (preg_match('/[\?\.\!！。"“’\']\s*$/uS', $t))//以句子结束
+            {
               $out .= trim($t);
               break;
             }
