@@ -3,7 +3,7 @@
 Plugin Name:WP CN Excerpt
 Plugin URI: http://www.joychao.cc/692.html
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.2.4
+Version: 4.2.5
 Author: Joychao
 Author URI: http://www.joychao.cc
 Copyright 2012 Joychao
@@ -74,6 +74,7 @@ if (!class_exists('AdvancedExcerpt')):
       //remove_filter('get_the_content', 'wp_trim_excerpt');
       // Replace everything
       remove_all_filters('get_the_content',100);
+      remove_all_filters('excerpt_length',100);
       $contentType=$this->default_options['only_excerpt']?'the_excerpt':'the_content';//显示时机
       add_filter($contentType, array(&$this,'filter'),100);
     }
@@ -114,72 +115,73 @@ if (!class_exists('AdvancedExcerpt')):
         $text = strip_tags($text, $tag_string);
       }
       // Create the excerpt
-      $text = $this->text_excerpt($text, $length, $finish_sentence);
+      $text = $this->text_excerpt($text, $length, $finish_sentence,$ellipsis);
       // Add the ellipsis or link
-      $text = $this->text_add_more($text, $ellipsis, ($add_link) ? $read_more : false);
+      $text = $this->text_add_more($text, ($add_link) ? $read_more : false);
       return $text;
     }
     
-    public function text_excerpt($text, $length, $finish_sentence)
+    public function text_excerpt($text, $length, $finish_sentence,$ellipsis)
     {
       $tokens = array();
       $out = '';
       $c = 0;
-      
-      //如果是以第一段结束
-      if($finish_sentence){
-        // Divide the string into tokens; HTML tags, or words, followed by any whitespace
-        // (<[^>]+>|[^<>\s]+\s*)
-        preg_match_all('/(<[^>]+>|[^<>\s]+)\s*/u', $text, $tokens);
-        foreach ($tokens[1] as $t)
-        { // Parse each token
-          if ($t[0] != '<')
-          { // Token is not a tag
+      $lastTagName = '';
+      $tokens = preg_split('/(<.*?>)/', $text, 0,PREG_SPLIT_DELIM_CAPTURE );
+      foreach ($tokens as $t){ // Parse each token
+        //如果是以第一段结束
+        if($finish_sentence){
+          if ($t[0] != '<' or stripos($t,'http://') !== 0){ // Token is not a tag
             if (preg_match('/[\?\.\!！。"“’\']\s*$/uS', $t))//以句子结束
             {
-              //$out .= trim($t);//原来去得好像太干净了...英文就不好看了..0.0
-              $out .= trim($t);
+              $out .= $t;
               break;
             }
           }
           // Append what's left of the token
-          $out .= $t;
+        }else{
+            if ($t[0] != '<' && $lastTagName != 'a'){
+              $l = mb_strlen(trim($t),'utf-8');//整句长度
+              preg_match_all('/&[\w#]{2,};/', $t,$match);
+              if(!empty($match[0])){
+                $entityLength = strlen(join($match[0])) - count($match[0]);//实体长度
+                $l -= $entityLength;//减去实体长度
+              }
+              if($l > $length){
+                $out .= $this->msubstr($t,0,$length,'utf-8',true,$ellipsis);
+                break;
+              }elseif($c + $l >= $length){
+                $out .= $this->msubstr($text,0,$length - $c,'utf-8',true,$ellipsis);
+                break;
+              }else{
+                $c += $l;
+              }
+            }else{
+              preg_match('/<([a-z]+)/', $t,$match);
+              $lastTagName = $match[1];
+            }
         }
-      }else{
-        $out = $this->msubstr($text,0,$length);
+        $out .= $t;
       }
       return trim(force_balance_tags($out));
     }
     
-    public function msubstr($str, $start=0, $length, $charset="utf-8", $suffix=true)  
+    public function msubstr($str, $start=0, $length, $charset="utf-8", $suffix=true,$ellipsis = '...')  
     {  
-        if(function_exists("mb_substr")){  
-            if($suffix)  
-                 return mb_substr($str, $start, $length, $charset)."...";  
-            else 
-                 return mb_substr($str, $start, $length, $charset);  
-        }  
-        elseif(function_exists('iconv_substr')) {  
-            if($suffix)  
-                 return iconv_substr($str,$start,$length,$charset)."...";  
-            else 
-                 return iconv_substr($str,$start,$length,$charset);  
-        }  
-        $re['utf-8']   = "/[x01-x7f]|[xc2-xdf][x80-xbf]|[xe0-xef][x80-xbf]{2}|[xf0-xff][x80-xbf]{3}/";  
-        $re['gb2312'] = "/[x01-x7f]|[xb0-xf7][xa0-xfe]/";  
-        $re['gbk']    = "/[x01-x7f]|[x81-xfe][x40-xfe]/";  
-        $re['big5']   = "/[x01-x7f]|[x81-xfe]([x40-x7e]|xa1-xfe])/";  
-        preg_match_all($re[$charset], $str, $match);  
+        $re['utf-8']   = "/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/";
+        $re['gb2312'] = "/[\x01-\x7f]|[\xb0-\xf7][\xa0-\xfe]/";
+        $re['gbk']    = "/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/";
+        $re['big5']   = "/[\x01-\x7f]|[\x81-\xfe]([\x40-\x7e]|\xa1-\xfe])/";
+        preg_match_all($re[$charset], $str, $match); 
         $slice = join("",array_slice($match[0], $start, $length));  
-        if($suffix) return $slice."…";  
+        if($suffix) return $slice.$ellipsis;  
         return $slice;
    } 
-    public function text_add_more($text, $ellipsis, $read_more)
+    public function text_add_more($text, $read_more)
     {
-      if ($read_more)
         // After the content
         $text .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), $read_more);
-      return $text;
+        return $text;
     }
     public function install()
     {
