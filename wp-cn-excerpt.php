@@ -1,12 +1,11 @@
 <?php
 /*
 Plugin Name:WP CN Excerpt
-Plugin URI: http://www.joychao.cc/692.html
+Plugin URI: http://wordpress.org/plugins/cn-excerpt/
 Description: WordPress高级摘要插件。支持在后台设置摘要长度，摘要最后的显示字符，以及允许哪些html标记在摘要中显示
-Version: 4.2.6
+Version:4.2.7
 Author: Joychao
-Author URI: http://www.joychao.cc
-Copyright 2012 Joychao
+Author URI: http://weibo.com/joychaocc
 ========================本插件修改自：Advanced excerpt by Bas van Doren(http://basvd.com/)==========================
 */
 if (!class_exists('AdvancedExcerpt')):
@@ -41,7 +40,7 @@ if (!class_exists('AdvancedExcerpt')):
             'img', 'input', 'ins', 'isindex', 'kbd', 'label', 'legend', 'li', 'map', 'menu', 'noframes', 'noscript',
             'object', 'ol', 'optgroup', 'option', 'p', 'param', 'pre', 'q', 's', 'samp', 'script', 'select', 'small',
             'span', 'strike', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th',
-            'thead', 'tr', 'tt', 'u', 'ul', 'var'
+            'thead', 'tr', 'tt', 'u', 'ul', 'var'   
         );
 
         // Singleton
@@ -148,7 +147,7 @@ if (!class_exists('AdvancedExcerpt')):
                 preg_match('/<([a-z]+)/', trim($t), $match);
                 $lastTagName = $match[1];
             }
-            return ltrim(force_balance_tags($out));
+            return ltrim(balanceTags($out, true));
         }
 
         public function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = TRUE, $ellipsis = '...') {
@@ -165,7 +164,7 @@ if (!class_exists('AdvancedExcerpt')):
 
         public function text_add_more($text, $read_more) {
             // After the content
-            $text .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), $read_more);
+            $text .= sprintf(' <a href="%s" class="read_more">%s</a>', htmlentities(get_permalink()), $read_more);
             return $text;
         }
 
@@ -226,44 +225,7 @@ if (!class_exists('AdvancedExcerpt')):
     <h2><?php
       _e("中文摘要设置", $this->text_domain);
 ?></h2>
-    <div style="height:100px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;font-size:22px;"><div>作者：<a style="text-decoration:none;" href="http://www.joychao.cc" target="_blank" title="访问他博客">@Joychao</a> 微博：<a  style="text-decoration:none;" href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" style="vertical-align:-8px;"  />@安正超</a>  捐赠链接：<a href="https://me.alipay.com/joychao" target="_blank"><img src="<?php echo WP_PLUGIN_URL;?>/cn-excerpt/alipay.png" style="vertical-align:-10px;" /></a></div>
-<!-- Baidu Button BEGIN -->
-    <div style="font-size:22px;height:50px; float:left; line-height:50px;">推荐给你的朋友们吧！</div><div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare" data="{'url':'http://www.joychao.cc/692.html'}">
-       <a class="bds_qzone"></a>
-        <a class="bds_tsina"></a>
-        <a class="bds_tqq"></a>
-        <a class="bds_renren"></a>
-        <a class="bds_diandian"></a>
-        <a class="bds_meilishuo"></a>
-        <a class="bds_tieba"></a>
-        <a class="bds_douban"></a>
-        <a class="bds_tqf"></a>
-        <a class="bds_kaixin001"></a>
-        <a class="bds_ff"></a>
-        <a class="bds_huaban"></a>
-        <a class="bds_mail"></a>
-        <span class="bds_more">更多</span>
-    <a class="shareCount"></a>
-    </div>
-    </div>
-<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=533119" ></script>
-<script type="text/javascript" id="bdshell_js"></script>
-<script type="text/javascript">
-  /**
-   * 在这里定义bds_config
-   */
-  var bds_config = {
-    'bdDes':'推荐一款强大的wordpress中文摘要插件：http://www.joychao.cc/692.html',    //'请参考自定义分享摘要'
-    'bdText':'给大家推荐一款强大的wordpress中文摘要插件！可选主题内容函数摘要显示，支持各种中文编码。可以说是一个非常理想的wordpress文章摘要插件。详情猛击这里->http://www.joychao.cc/692.html',   //'请参考自定义分享内容'
-    'bdComment':'非常理想的wordpress文章摘要插件',  //'请参考自定义分享评论'
-    'bdPic':'http://www.joychao.cc/wp-content/uploads/2012/07/QQ%E6%88%AA%E5%9B%BE20120930063343.png', //'请参考自定义分享出去的图片'
-    'searchPic':false,
-    'wbUid':'2193182644',   //'请参考自定义微博 id'
-    'snsKey':{'tsina':'4000238328'}   //'请参考自定义分享到平台的appkey'
-  }
-  document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + new Date().getHours();
-</script>
-<!-- Baidu Button END -->
+    
     <form method="post" action="">
     <?php
       if (function_exists('wp_nonce_field'))
@@ -385,7 +347,44 @@ if (!class_exists('AdvancedExcerpt')):
                 </td>
             </tr>
         </table>
-        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 使用过程中有任何问题，欢迎到<a href="http://www.joychao.cc/692.html" target="_blank">我的博客</a> 留言 或者给我邮件：<strong>joy@joychao.cc</strong>，我会在最短的时间内尽可能的解决您的问题,感谢您的支持！</div>
+        <div style="height:100px; line-height:50px; border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;font-size:22px;"><div>作者：<a  style="text-decoration:none;" href="http://weibo.com/joychaocc" target="_blank"><img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_32x32.png" style="vertical-align:-8px;"  />@安正超</a></div>
+            <!-- Baidu Button BEGIN -->
+                <div style="font-size:22px;height:50px; float:left; line-height:50px;">推荐给你的朋友们吧！</div><div id="bdshare" class="bdshare_t bds_tools_32 get-codes-bdshare" data="{'url':'http://wordpress.org/plugins/cn-excerpt/'}">
+                   <a class="bds_qzone"></a>
+                    <a class="bds_tsina"></a>
+                    <a class="bds_tqq"></a>
+                    <a class="bds_renren"></a>
+                    <a class="bds_diandian"></a>
+                    <a class="bds_meilishuo"></a>
+                    <a class="bds_tieba"></a>
+                    <a class="bds_douban"></a>
+                    <a class="bds_tqf"></a>
+                    <a class="bds_kaixin001"></a>
+                    <a class="bds_ff"></a>
+                    <a class="bds_huaban"></a>
+                    <a class="bds_mail"></a>
+                    <span class="bds_more">更多</span>
+                <a class="shareCount"></a>
+                </div>
+                </div>
+            <script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=533119" ></script>
+            <script type="text/javascript" id="bdshell_js"></script>
+            <script type="text/javascript">
+              /**
+               * 在这里定义bds_config
+               */
+              var bds_config = {
+                'bdDes':'推荐一款强大的wordpress中文摘要插件【wp-cn-excerpt】：http://wordpress.org/plugins/cn-excerpt/',    //'请参考自定义分享摘要'
+                'bdText':'给大家推荐一款强大的wordpress中文摘要插件！可选主题内容函数摘要显示，支持各种中文编码。可以说是一个非常理想的wordpress文章摘要插件。详情猛击这里->http://wordpress.org/plugins/cn-excerpt/',   //'请参考自定义分享内容'
+                'bdComment':'非常理想的wordpress文章摘要插件',  //'请参考自定义分享评论'
+                'searchPic':false,
+                'wbUid':'2193182644',   //'请参考自定义微博 id'
+                'snsKey':{'tsina':'4000238328'}   //'请参考自定义分享到平台的appkey'
+              }
+              document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + new Date().getHours();
+            </script>
+            <!-- Baidu Button END -->
+        <div style="padding:10px;border:1px dashed #bebebe;margin:10px 0;"><strong>注意：</strong> 使用过程中有任何问题，欢迎到<a href="http://wordpress.org/plugins/cn-excerpt/" target="_blank">我的博客</a> 留言 或者给我邮件：<strong>joy@joychao.cc</strong>，我会在最短的时间内尽可能的解决您的问题,感谢您的支持！</div>
         <p class="submit"><input type="submit" name="Submit" class="button-primary"
                                  value="<?php _e("保存设置", $this->text_domain); ?>" /></p>
     </form>
@@ -395,6 +394,7 @@ if (!class_exists('AdvancedExcerpt')):
     #formTable td{padding: 10px 0; line-height: 2em; border-bottom: 1px solid #bebebe;}
     #formTable table td{line-height: auto;padding: 0;border-bottom:none;}
     </style>
+
 </div>
 <?php
     }

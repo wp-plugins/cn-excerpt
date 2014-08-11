@@ -1,10 +1,10 @@
 === WP CN Excerpt ===
 Contributors:Joychao
-Tags: chinese,cn,excerpt, advanced, post, posts, template, formatting
+Tags: 中文摘要,摘要,chinese,cn,excerpt, advanced, post, posts, template, formatting
 Donate link: https://me.alipay.com/joychao
 Requires at least: 3.2
-Tested up to: 3.4.2
-Stable tag: 4.2.6
+Tested up to: 3.9.2
+Stable tag:4.2.7
 
 
 == Description ==
@@ -19,17 +19,6 @@ Stable tag: 4.2.6
 摘要长度是真实的内容的长度（不包含HTML标签）；
 主题开发者可以使用the_advanced_expert()方法进行更多的控制。
 这个插件可以完美的支持自动中文摘要，而且不局限于生成中文摘要，所有的UNICODE字符都支持。
-
-This plugin adds several improvements to WordPress' default way of creating excerpts.
-1. Keeps HTML markup in the excerpt (and you get to choose which tags are included)
-2. Trims the excerpt to a given length using either character count or word count
-3. Only the 'real' text is counted (HTML is ignored but kept
-4. Customizes the excerpt length and the ellipsis character that are used
-5. Completes the last word or sentence in an excerpt (no weird cuts)
-6. Adds a *read-more* link to the text
-7. Theme developers can use `the_advanced_excerpt()` for even more control (see the FAQ)
-
-Most of the above features are optional and/or can be customized by the user or theme developer.
 
 
 == Installation ==
