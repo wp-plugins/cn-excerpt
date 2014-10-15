@@ -164,7 +164,7 @@ class AdvancedCNExcerpt
      */
     public function pageOptions()
     {
-        include dirname() . '/wp-cn-excerpt-options.php';
+        include dirname(__FILE__) . '/wp-cn-excerpt-options.php';
     }
 
     /**
