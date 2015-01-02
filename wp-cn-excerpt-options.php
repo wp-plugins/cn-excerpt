@@ -10,7 +10,7 @@ $tagList  = array_unique(self::$optionsBasicTags + $allowed_tags);
 
 sort($tagList);
 
-$tag_cols = 5;
+$tagCols = 5;
 $plugin = get_plugin_data(__DIR__ . '/wp-cn-excerpt.php');
 ?>
 <div class="wrap" style=" font-family:Microsoft YaHei; ">
@@ -58,6 +58,13 @@ $plugin = get_plugin_data(__DIR__ . '/wp-cn-excerpt.php');
                 </td>
             </tr>
             <tr valign="top">
+                <th scope="row"><label for="<?php echo $this->name; ?>_read_more">
+                <?php  _e("链接模板：", $this->textDomain); ?></label></th>
+                <td>
+                    <input name="<?php echo $this->name; ?>_read_more_tpl" type="text"  id="<?php echo $this->name; ?>_read_more_tpl" value="<?php echo $read_more; ?>" />
+                </td>
+            </tr>
+            <tr valign="top">
                 <th scope="row"><label for="<?php echo $this->name; ?>_no_shortcode">
                 <?php _e("过滤标签：", $this->textDomain); ?></label></th>
                 <td>
@@ -70,7 +77,7 @@ $plugin = get_plugin_data(__DIR__ . '/wp-cn-excerpt.php');
                 <td>
                     <table id="<?php echo $this->name; ?>_tags_table">
                         <tr>
-                            <td colspan="<?php echo $tag_cols; ?>">
+                            <td colspan="<?php echo $tagCols; ?>">
                                 <input name="<?php echo $this->name; ?>_allowed_tags[]" type="checkbox"  value="_all" <?php echo (in_array('_all', $allowed_tags)) ? 'checked="checked" ' : ''; ?>/>
                                 <?php _e("不移除任何标签", $this->textDomain); ?>
                             </td>
@@ -83,7 +90,7 @@ $plugin = get_plugin_data(__DIR__ . '/wp-cn-excerpt.php');
                                 if ($tag == '_all') {
                                   continue;
                                 }
-                                if (0 == $i % $tag_cols) {
+                                if (0 == $i % $tagCols) {
                                   echo '<tr>';
                                 }
 
@@ -94,14 +101,14 @@ $plugin = get_plugin_data(__DIR__ . '/wp-cn-excerpt.php');
                               <code><label for="tag<?php echo $j++;?>"><?php echo $tag; ?></label></code>
                           </td>
                           <?php
-                            if (0 == $i % $tag_cols) {
+                            if (0 == $i % $tagCols) {
                               $i = 0;
                               echo '</tr>';
                             }
                           endforeach;
-                                if (0 != $i % $tag_cols):
+                                if (0 != $i % $tagCols):
                           ?>
-                          <td colspan="<?php echo ($tag_cols - $i); ?>">&nbsp;</td>
+                          <td colspan="<?php echo ($tagCols - $i); ?>">&nbsp;</td>
                         </tr>
                             <?php
                                   endif;

@@ -19,6 +19,7 @@ class AdvancedCNExcerpt
         'finish_sentence' => 0,
         'ellipsis'        => '...',
         'read_more'       => '阅读全文',
+        'read_more_tpl'   => '<a href=":url" class="read-more">:label</a>',
         'add_link'        => 1,
         'allowed_tags'    => array('_all'),
     );
@@ -89,10 +90,12 @@ class AdvancedCNExcerpt
         if (is_single() || is_page() || is_singular()) {
             return $text;
         }
-	if (!get_post()) {
-	    return false;
-	}
-	$text = get_post()->post_content();
+
+        if (!$post = get_post()) {
+            return false;
+        }
+
+        $text = $post->post_content;
         $allowedTags = $this->options['allowed_tags'];
         $text = force_balance_tags($text);
 
@@ -328,11 +331,19 @@ class AdvancedCNExcerpt
      *
      * @return string.
      */
-    protected function addReadMore($text, $readMoreText)
+    protected function addReadMore($text, $readMoreText, $tpl = '')
     {
         !empty($readMoreText) || $readMoreText = '阅读全文';
+
+        !empty($tpl) || $tpl = '<a href=":url" class="read-more">:label</a>';
+
+        $replace = array(
+            ':url'   => get_permalink(),
+            ':label' => htmlspecialchars($readMoreText, ENT_COMPAT, 'UTF-8'),
+        );
+
         // After the content
-        $text .= sprintf(' <a href="%s" class="read_more">%s</a>', get_permalink(), htmlspecialchars($readMoreText, ENT_COMPAT, 'UTF-8'));
+        $text .= str_replace(array_keys($replace), $replace, $tpl);
 
         return $text;
     }
@@ -364,6 +375,7 @@ class AdvancedCNExcerpt
         // TODO: Drop magic quotes (deprecated in php 5.3)
         $ellipsis    = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_ellipsis']) : $_POST[$this->name . '_ellipsis'];
         $readMore   = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_read_more']) : $_POST[$this->name . '_read_more'];
+        $readMoreTpl  = (get_magic_quotes_gpc() == 1) ? stripslashes($_POST[$this->name . '_read_more_tpl']) : $_POST[$this->name . '_read_more_tpl'];
         $allowedTags = array_unique((array)$_POST[$this->name . '_allowed_tags']);
         if (in_array('_all', $allowedTags)) {
             $allowedTags = array('_all');
@@ -375,6 +387,7 @@ class AdvancedCNExcerpt
         update_option($this->name . '_finish_sentence', $finishSentence);
         update_option($this->name . '_ellipsis', $ellipsis);
         update_option($this->name . '_read_more', $readMore);
+        update_option($this->name . '_read_more_tpl', $readMoreTpl);
         update_option($this->name . '_add_link', $addLink);
         update_option($this->name . '_allowed_tags', $allowedTags);
 
