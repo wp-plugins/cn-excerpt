@@ -3,7 +3,7 @@ Contributors: Carlos
 Tags: 中文摘要,摘要,chinese,cn,excerpt, advanced, post, posts, template, formatting
 Donate link: https://github.com/overtrue
 Requires at least: 3.2
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag:4.3.7
 
 
